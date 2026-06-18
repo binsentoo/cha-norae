@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Car Karaoke</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#0a0a0a;color:#fff;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none;-webkit-tap-highlight-color:transparent}
+#connect-screen{position:absolute;inset:0;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:18px;z-index:10}
+#connect-screen h2{font-size:22px;font-weight:500;text-align:center}
+#connect-screen p{font-size:13px;color:rgba(255,255,255,0.4);text-align:center;line-height:1.65}
+#connect-btn{width:100%;height:54px;background:#1DB954;border:none;border-radius:14px;color:#000;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity .15s}
+#connect-btn:active{opacity:.82}
+#token-wrap{width:100%;display:none;flex-direction:column;gap:8px}
+#token-input{width:100%;height:46px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.14);border-radius:12px;color:#fff;font-size:12px;padding:0 14px;font-family:monospace}
+#token-input::placeholder{color:rgba(255,255,255,0.22)}
+#token-submit{width:100%;height:46px;background:#fff;border:none;border-radius:12px;color:#0a0a0a;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer}
+#token-submit:active{opacity:.85}
+#err{font-size:12px;color:#ff6b6b;text-align:center;display:none;min-height:16px}
+#main{display:none;flex-direction:column;height:100vh}
+#status{display:flex;justify-content:space-between;align-items:center;padding:12px 20px 8px;font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:.05em}
+#now-playing{padding:0 18px 10px;display:flex;align-items:center;gap:12px;border-bottom:.5px solid rgba(255,255,255,0.07)}
+#art{width:40px;height:40px;border-radius:6px;background:#1e1e1e;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:16px}
+#art img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+#tinfo{flex:1;min-width:0}
+#tname{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#aname{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#dot{width:7px;height:7px;border-radius:50%;background:#1DB954;flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+#prog-wrap{height:2px;background:rgba(255,255,255,0.08);margin:0 18px}
+#prog{height:100%;background:#fff;width:0%;transition:width .8s linear;border-radius:1px}
+#lyrics-area{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:20px 26px;overflow:hidden;position:relative}
+.lline{font-size:26px;font-weight:300;line-height:1.45;color:rgba(255,255,255,0.18);transition:all .35s ease;margin:4px 0;letter-spacing:-.01em;width:100%}
+.lline.active{font-size:31px;font-weight:500;color:#fff;margin:8px 0}
+.lline.next{color:rgba(255,255,255,0.42)}
+#no-lyrics{display:none;color:rgba(255,255,255,0.22);font-size:15px;text-align:center;line-height:1.8;width:100%}
+#loading{display:none;gap:6px;align-items:center;justify-content:center;width:100%}
+#loading span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.28);animation:db 1.2s infinite}
+#loading span:nth-child(2){animation-delay:.2s}
+#loading span:nth-child(3){animation-delay:.4s}
+@keyframes db{0%,80%,100%{transform:scale(.7);opacity:.35}40%{transform:scale(1);opacity:1}}
+#sync-badge{position:absolute;top:14px;right:18px;font-size:10px;padding:3px 8px;border-radius:20px;background:rgba(29,185,84,0.15);color:#1DB954;border:.5px solid rgba(29,185,84,0.3);letter-spacing:.04em;display:none}
+#controls{padding:14px 18px 28px;display:flex;gap:10px;align-items:center}
+#skip-btn{flex:1;height:72px;background:#fff;color:#0a0a0a;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:18px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s,background .1s}
+#skip-btn:active{transform:scale(.97);background:rgba(255,255,255,.85)}
+#skip-song-btn{width:72px;height:72px;background:#1DB954;color:#000;border:none;border-radius:14px;font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s,opacity .1s;flex-shrink:0}
+#skip-song-btn:active{transform:scale(.97);opacity:.82}
+#side{display:flex;flex-direction:column;gap:8px}
+.sbtn{width:54px;height:32px;background:rgba(255,255,255,.07);border:.5px solid rgba(255,255,255,.11);border-radius:9px;color:rgba(255,255,255,.55);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;font-family:'DM Sans',sans-serif}
+.sbtn:active{background:rgba(255,255,255,.17)}
+</style>
+</head>
+<body>
+
+<div id="connect-screen">
+  <div style="width:60px;height:60px;border-radius:16px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:28px">🎤</div>
+  <h2>Car Karaoke</h2>
+  <p>Connect Spotify to get perfectly synced lyrics for whatever's playing. Tap once — that's it.</p>
+  <button id="connect-btn" onclick="startOAuth()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+    Connect with Spotify
+  </button>
+
+  <div id="err"></div>
+</div>
+
+<div id="main">
+  <div id="status"><span id="clk">9:41</span><span>karaoke</span></div>
+  <div id="now-playing">
+    <div id="art">♪</div>
+    <div id="tinfo"><div id="tname">—</div><div id="aname">waiting...</div></div>
+    <div id="dot"></div>
+  </div>
+  <div id="prog-wrap"><div id="prog"></div></div>
+  <div id="lyrics-area">
+    <div id="sync-badge">⏱ synced</div>
+    <div id="loading"><span></span><span></span><span></span></div>
+    <div id="llines"></div>
+    <div id="no-lyrics"></div>
+  </div>
+  <div id="controls">
+    <button id="skip-btn" onclick="skipLine()">⏭ Skip Line</button>
+    <button id="skip-song-btn" onclick="skipSong()">⏩</button>
+    <div id="side">
+      <button class="sbtn" onclick="togglePause()" id="pbtn">⏸</button>
+      <button class="sbtn" onclick="cycleSize()">A+</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CLIENT_ID = "68a9ef73c12146999d559e17b3ea3244";
+const SCOPES = [
+  "user-read-currently-playing",
+  "user-read-playback-state",
+  "user-modify-playback-state"
+].join(" ");
+
+let token='', refreshToken='', trackId='', lyrics=[], syncedLines=[], currentIdx=0;
+let paused=false, fsize=26, pollTimer=null, syncTimer=null, autoTimer=null;
+let trackStart=0, trackDuration=0, isSynced=false;
+
+function startOAuth(){
+  const params = new URLSearchParams({
+    client_id: CLIENT_ID,
+    response_type: "code",
+    redirect_uri: window.location.origin + "/api/callback",
+    scope: SCOPES,
+  });
+  window.location.href = "https://accounts.spotify.com/authorize?" + params;
+}
+
+async function refreshAccessToken(){
+  const rt = refreshToken || localStorage.getItem("sp_refresh_token");
+  if(!rt) return false;
+  try {
+    const r = await fetch("/api/refresh_token?token=" + encodeURIComponent(rt));
+    if(r.ok){
+      const d = await r.json();
+      if(d.access_token){
+        token = d.access_token;
+        if(d.refresh_token){
+          refreshToken = d.refresh_token;
+          localStorage.setItem("sp_refresh_token", d.refresh_token);
+        }
+        setTimeout(refreshAccessToken, (d.expires_in - 300) * 1000);
+        return true;
+      }
+    }
+  } catch(e) {}
+  return false;
+}
+
+function launch(){
+  document.getElementById('connect-screen').style.display='none';
+  document.getElementById('main').style.display='flex';
+  startPoll();
+  startClock();
+}
+
+async function autoConnect(){
+  // Check if returning from OAuth callback
+  const params = new URLSearchParams(window.location.search);
+  const accessToken = params.get("access_token");
+  const rt = params.get("refresh_token");
+  const err = params.get("error");
+
+  if(err){ setErr("Spotify auth error: " + err); return; }
+
+  if(accessToken && rt){
+    token = accessToken;
+    refreshToken = rt;
+    localStorage.setItem("sp_refresh_token", rt);
+    window.history.replaceState({}, '', '/');
+    const expiresIn = parseInt(params.get("expires_in") || "3600");
+    setTimeout(refreshAccessToken, (expiresIn - 300) * 1000);
+    launch();
+    return;
+  }
+
+  // Try stored refresh token
+  const stored = localStorage.getItem("sp_refresh_token");
+  if(stored){
+    const ok = await refreshAccessToken();
+    if(ok){ launch(); return; }
+  }
+
+  // Show connect button
+}
+
+function setErr(m){const e=document.getElementById('err');e.textContent=m;e.style.display=m?'block':'none';}
+
+async function fetchTrack(){
+  try{
+    const r=await fetch('https://api.spotify.com/v1/me/player/currently-playing',{headers:{Authorization:'Bearer '+token}});
+    if(r.status===401){
+      const refreshed = await refreshAccessToken();
+      if(refreshed) return await fetchTrack();
+      return false;
+    }
+    if(r.status===204)return true;
+    if(!r.ok)return false;
+    const d=await r.json();
+    if(!d||!d.item)return true;
+    const t=d.item;
+    document.getElementById('tname').textContent=t.name;
+    document.getElementById('aname').textContent=t.artists.map(a=>a.name).join(', ');
+    trackDuration=t.duration_ms;
+    trackStart=Date.now()-d.progress_ms;
+    document.getElementById('prog').style.width=Math.round(d.progress_ms/t.duration_ms*100)+'%';
+    if(t.album?.images?.length){
+      const img=new Image();
+      img.src=t.album.images[t.album.images.length-1].url;
+      img.onload=()=>{const a=document.getElementById('art');a.innerHTML='';a.appendChild(img);};
+    }
+    if(t.id!==trackId){
+      trackId=t.id;
+      currentIdx=0;
+      await fetchLyrics(t.name, t.artists[0].name, t.album?.name, Math.round(t.duration_ms/1000));
+    }
+    return true;
+  }catch(e){return false;}
+}
+
+// Detect if a string is romanized (mostly latin) when we expect non-latin
+function isLatin(str){
+  const latinChars=(str.match(/[a-zA-Z]/g)||[]).length;
+  return latinChars/str.length > 0.6;
+}
+
+function hasNonLatin(str){
+  return /[\u0080-\uFFFF]/.test(str);
+}
+
+// Pick best result from LRCLib search: prefer original script over romanized
+function pickBestResult(results, trackName){
+  if(!results.length)return null;
+  const originalHasNonLatin=hasNonLatin(trackName);
+  if(!originalHasNonLatin) return results[0]; // latin track, first result fine
+
+  // Track name has non-latin chars — prefer results whose lyrics also have non-latin
+  const withOriginalScript=results.filter(r=>{
+    const sample=(r.syncedLyrics||r.plainLyrics||'').slice(0,200);
+    return hasNonLatin(sample);
+  });
+  return withOriginalScript.length>0 ? withOriginalScript[0] : results[0];
+}
+
+function parseLRC(lrc){
+  const lines=[];
+  lrc.split('\n').forEach(line=>{
+    const m=line.match(/^\[(\d+):(\d+\.\d+)\](.*)/);
+    if(m){
+      const secs=parseInt(m[1])*60+parseFloat(m[2]);
+      const text=m[3].trim();
+      if(text)lines.push({time:secs,text});
+    }
+  });
+  return lines;
+}
+
+function applyLyrics(data){
+  if(data.syncedLyrics){
+    isSynced=true;
+    syncedLines=parseLRC(data.syncedLyrics);
+    lyrics=syncedLines.map(l=>l.text);
+    document.getElementById('sync-badge').style.display='block';
+    startSyncedScroll();
+  } else if(data.plainLyrics){
+    isSynced=false;
+    lyrics=data.plainLyrics.split('\n').map(l=>l.trim()).filter(l=>l.length>0&&!l.startsWith('['));
+    document.getElementById('sync-badge').style.display='none';
+    startAutoAdvance();
+  }
+}
+
+async function fetchLyrics(title, artist, album, duration){
+  setLoading(true);
+  setNoLyrics('');
+  isSynced=false;
+  lyrics=[];
+  syncedLines=[];
+  clearInterval(syncTimer);
+  clearInterval(autoTimer);
+  document.getElementById('sync-badge').style.display='none';
+
+  try{
+    // Try exact match first
+    let url=`https://lrclib.net/api/get?track_name=${encodeURIComponent(title)}&artist_name=${encodeURIComponent(artist)}`;
+    if(album)url+=`&album_name=${encodeURIComponent(album)}`;
+    if(duration)url+=`&duration=${duration}`;
+    const r=await fetch(url);
+
+    if(r.ok){
+      const d=await r.json();
+      if(d.instrumental){setLoading(false);setNoLyrics('🎵 Instrumental');return;}
+
+      // Check if lyrics are romanized when track name suggests original script
+      const sample=(d.syncedLyrics||d.plainLyrics||'').slice(0,200);
+      const needsOriginal=hasNonLatin(title+artist);
+      const looksRomanized=needsOriginal && isLatin(sample);
+
+      if(!looksRomanized && (d.syncedLyrics||d.plainLyrics)){
+        applyLyrics(d);
+        renderLyrics();
+        setLoading(false);
+        return;
+      }
+      // Fall through to search for better (non-romanized) match
+    }
+
+    // Search fallback — fetch multiple results to find original-script version
+    const r2=await fetch(`https://lrclib.net/api/search?track_name=${encodeURIComponent(title)}&artist_name=${encodeURIComponent(artist)}`);
+    if(r2.ok){
+      const results=await r2.json();
+      const best=pickBestResult(results, title+artist);
+      if(best){
+        applyLyrics(best);
+        renderLyrics();
+        setLoading(false);
+        return;
+      }
+    }
+
+    setNoLyrics('No lyrics found\nTry a different song');
+  }catch(e){
+    setNoLyrics('No lyrics found\nTry a different song');
+  }
+  setLoading(false);
+}
+
+function startSyncedScroll(){
+  clearInterval(syncTimer);
+  syncTimer=setInterval(()=>{
+    if(paused||!syncedLines.length)return;
+    const elapsed=(Date.now()-trackStart)/1000;
+    let idx=0;
+    for(let i=0;i<syncedLines.length;i++){
+      if(syncedLines[i].time<=elapsed)idx=i;
+    }
+    if(idx!==currentIdx){currentIdx=idx;renderLyrics();}
+    document.getElementById('prog').style.width=Math.min(100,Math.round((Date.now()-trackStart)/trackDuration*100))+'%';
+  },250);
+}
+
+function startAutoAdvance(){
+  clearInterval(autoTimer);
+  autoTimer=setInterval(()=>{
+    if(paused||!lyrics.length)return;
+    if(currentIdx<lyrics.length-1){currentIdx++;renderLyrics();}
+  },3800);
+}
+
+function renderLyrics(){
+  const c=document.getElementById('llines');
+  c.innerHTML='';
+  if(!lyrics.length)return;
+  [currentIdx-1,currentIdx,currentIdx+1,currentIdx+2].forEach(i=>{
+    if(i<0||i>=lyrics.length)return;
+    const d=document.createElement('div');
+    d.className='lline'+(i===currentIdx?' active':i===currentIdx+1?' next':'');
+    d.textContent=lyrics[i];
+    d.style.fontSize=i===currentIdx?(fsize+5)+'px':fsize+'px';
+    c.appendChild(d);
+  });
+}
+
+function skipLine(){
+  if(!lyrics.length)return;
+  currentIdx=Math.min(currentIdx+1,lyrics.length-1);
+  if(isSynced)trackStart=Date.now()-syncedLines[currentIdx].time*1000;
+  renderLyrics();
+  if(!isSynced){clearInterval(autoTimer);startAutoAdvance();}
+  const b=document.getElementById('skip-btn');
+  b.style.background='rgba(255,255,255,.82)';
+  setTimeout(()=>b.style.background='#fff',120);
+}
+
+function togglePause(){
+  paused=!paused;
+  document.getElementById('pbtn').textContent=paused?'▶':'⏸';
+  if(!paused&&isSynced)trackStart=Date.now()-syncedLines[currentIdx].time*1000;
+}
+
+function cycleSize(){fsize=fsize>=36?20:fsize+4;renderLyrics();}
+
+function setLoading(v){
+  document.getElementById('loading').style.display=v?'flex':'none';
+  document.getElementById('llines').style.display=v?'block':'block';
+}
+
+function setNoLyrics(msg){
+  const el=document.getElementById('no-lyrics');
+  el.style.display=msg?'flex':'none';
+  el.style.flexDirection='column';
+  el.style.alignItems='center';
+  el.innerHTML=msg.replace('\n','<br>');
+}
+
+function startPoll(){
+  clearInterval(pollTimer);
+  fetchTrack();
+  pollTimer=setInterval(fetchTrack,8000);
+}
+
+function startClock(){
+  function upd(){
+    const n=new Date();
+    document.getElementById('clk').textContent=n.getHours()+':'+String(n.getMinutes()).padStart(2,'0');
+  }
+  upd();
+  setInterval(upd,10000);
+}
+
+async function skipSong(){
+  const btn=document.getElementById('skip-song-btn');
+  btn.textContent='⏳';
+  try{
+    await fetch('https://api.spotify.com/v1/me/player/next',{
+      method:'POST',
+      headers:{Authorization:'Bearer '+token}
+    });
+    setTimeout(fetchTrack,600);
+  } catch(e){}
+  setTimeout(()=>btn.textContent='⏩',700);
+}
+
+// Auto-connect on load
+autoConnect();
+</script>
+</body>
+</html>
