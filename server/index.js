@@ -5,9 +5,6 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
-const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
-const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-
 const PORT = process.env.PORT || 3000
 
 // refresh token lasts 180 days
