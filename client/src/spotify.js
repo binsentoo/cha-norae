@@ -22,9 +22,23 @@ export async function fetchCurrentlyPlaying(accessToken) {
     }
 
     if (!response.ok) {
+         const err = new Error('Failed to fetch current song');
         err.status = response.status;
         throw err;
     }
 
     return response.json();
+}
+
+export async function skipSong(accessToken) {
+    const response = await fetch('https://api.spotify.com/v1/me/player/next', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + accessToken }
+    });
+
+    if (!response.ok) {
+        const err = new Error('Failed to skip song');
+        err.status = response.status
+        throw err;
+    }
 }
