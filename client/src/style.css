@@ -87,13 +87,20 @@ html, body {
   font-family: 'Outfit', 'Noto Sans KR', 'Noto Sans JP', sans-serif;
   max-width: 100%;
   overflow-wrap: break-word;
+  padding-block: 5px;
 }
 
 .lyrics-active {
-  color: var(--color-text)
+  color: var(--color-text);
+}
+
+#bottom-container {
+  display: flex;
+  gap: 12px;
 }
 
 #skip-btn {
+  flex: 6;
   font-family: inherit;
   background-color: var(--color-accent-coral);
   border: none;
@@ -101,8 +108,19 @@ html, body {
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
   font-size: 20px;  
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+#change-size {
+  flex: 1;
+  font-family: inherit;
+  background-color: transparent;
+  border: 1px solid var(--color-text-dim);
+  color: var(--color-text);
+  text-align: center;
+  font-size: 20px;
   cursor: pointer;
   border-radius: 10px;
 }

@@ -104,4 +104,21 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 10000); // checks every 10 seconds
 
+// handle lyrics sizing
+let fontSize = 30;
+const ACTIVE_SIZE_BOOST = 8; // how much bigger the active line is than the others
+
+function changeSize() {
+    fontSize = fontSize >= 46 ? 22 : fontSize + 4;
+    
+    const lines = document.querySelectorAll(".lyric-line");
+    lines.forEach(line => {
+        line.style.fontSize = fontSize + 'px';
+    });
+
+    document.getElementById("lyrics-current").style.fontSize = (fontSize + ACTIVE_SIZE_BOOST) + 'px';
+}
+
+document.getElementById("change-size").addEventListener('click', changeSize);
+
 init()
