@@ -18,8 +18,7 @@ async function poll() {
         }
 
         const track = data.item;
-        const trackChanged = !currentTrack || currentTrack.id !== track.id;
-        const trackStart = trackChanged ? Date.now() - data.progress_ms : currentTrack.trackStart;
+        const trackStart = Date.now() - data.progress_ms;
 
         currentTrack = {
             id: track.id,
