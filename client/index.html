@@ -4,14 +4,47 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>client</title>
+    <title>Car Karaoke</title>
+    <link rel="stylesheet" href="/src/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Outfit:wght@100..900&family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   </head>
   <body>
     <div id="app">
-      <button id="connect-btn">press me</button>
-      <pre id="result"></pre>
-      <pre id="current-track"></pre>
-      <pre id="lyrics"></pre>
+      <div id="connect-screen">
+        <h2>Car Karaoke</h2>
+        <p>Connect your Spotify account to get perfectly synced lyrics for whatever's playing.</p>
+        <button id="connect-btn" onclick="startOAuth()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          Connect with Spotify
+        </button>
+      </div>
+
+      <div id="player-screen" hidden>
+        <div id="header">
+          <span id="time">time</span>
+          <span id="display-name">name</span>
+          <span>karaoke</span>
+        </div>
+
+        <div id="track-info">
+          <div id="album-art"></div>
+          <div id="text-info">
+            <div id="title"></div>
+            <div id="artist"></div>
+          </div>        
+        </div>
+
+        <div id="lyrics-container">
+          <div class="lyric-line" id="lyrics-prev"></div>
+          <div class="lyric-line lyrics-active" id="lyrics-current"></div>
+          <div class="lyric-line" id="lyrics-next1"></div>
+          <div class="lyric-line" id="lyrics-next2"></div>
+        </div>
+
+        <button id="skip-btn">⏭ Skip Song</button>
+      </div>
     </div>
     <script type="module" src="/src/main.js"></script>
   </body>
