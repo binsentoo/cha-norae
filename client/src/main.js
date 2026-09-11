@@ -60,7 +60,6 @@ async function handleTrackUpdate(track) {
     document.getElementById("title").textContent = track.name;
     currentTrackDuration = track.durationMs;
     currentLyrics = await fetchLyrics(track.name, track.artist, track.album, Math.round(track.durationMs / 1000));
-    //document.getElementById("lyrics").textContent = currentLyrics.lines;
 
     if (track.albumArt) {
         const img = new Image();
@@ -105,7 +104,6 @@ function renderLoop() {
 }
 
 requestAnimationFrame(renderLoop);
-
 
 function updateClock() {
     const now = new Date();
