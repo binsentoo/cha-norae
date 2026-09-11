@@ -9,6 +9,7 @@ const params = new URLSearchParams(window.location.search);
 const isCallback = params.has('access_token') || params.has('error');
 
 let currentLyrics = null;
+let currentTrackDuration = null;
 
 function enterApp() {
     startPolling(handleTrackUpdate);
@@ -33,7 +34,6 @@ function enterApp() {
 async function init() {
     if (isCallback) {
         const result = await handleOAuthCallback();
-        document.getElementById('result').textContent = JSON.stringify(result);
 
         if (result.success) {
             enterApp();
@@ -58,6 +58,7 @@ async function handleTrackUpdate(track) {
 
     document.getElementById("artist").textContent = track.artist;
     document.getElementById("title").textContent = track.name;
+    currentTrackDuration = track.durationMs;
     currentLyrics = await fetchLyrics(track.name, track.artist, track.album, Math.round(track.durationMs / 1000));
     //document.getElementById("lyrics").textContent = currentLyrics.lines;
 
@@ -75,7 +76,8 @@ async function handleTrackUpdate(track) {
 
 // for lyrics + progress bar
 function renderLoop() {
-    let elapsedSec = getEstimatedProgressMs() / 1000;
+    const elapsedMs = getEstimatedProgressMs();
+    let elapsedSec = elapsedMs / 1000;
     if (currentLyrics && currentLyrics.synced) {
         let index = getActiveLineIndex(currentLyrics.lines, elapsedSec);
         const prevLine = currentLyrics.lines[index - 1]?.text || '';
@@ -89,6 +91,11 @@ function renderLoop() {
         document.getElementById("lyrics-next2").textContent = nextLine2;
         
     }
+    const progressPercent = Math.min(100, (elapsedMs / currentTrackDuration) * 100);
+    document.getElementById("progress-fill").style.width = progressPercent + '%';
+
+    document.getElementById("time-elapsed").textContent = formatTime(elapsedMs);
+    document.getElementById("time-duration").textContent = formatTime(currentTrackDuration);
     requestAnimationFrame(renderLoop);
 }
 
@@ -120,5 +127,12 @@ function changeSize() {
 }
 
 document.getElementById("change-size").addEventListener('click', changeSize);
+
+function formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return minutes + ':' + String(seconds).padStart(2, '0');
+}
 
 init()
