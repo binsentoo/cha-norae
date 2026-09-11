@@ -10,17 +10,19 @@ export async function exchangeToken(bodyParams) {
         client_secret: CLIENT_SECRET,
         ...bodyParams,
     });
- 
+
     const response = await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: body.toString(),
     });
- 
+
     if (!response.ok) {
+        const errorBody = await response.text();
+        console.log('Spotify error response:', response.status, errorBody);
         throw new Error(`Spotify token exchange failed: ${response.status}`);
     }
- 
+
     return response.json();
 }
  
