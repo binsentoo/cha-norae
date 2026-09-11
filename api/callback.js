@@ -1,7 +1,4 @@
 // api/callback.js -- vercel serverless function, default handler
-
-// api/callback.js — Vercel serverless function
-// Same logic as the old Express route, just exported as a default handler instead of app.get(...)
 import { exchangeToken } from './_utils.js';
 
 export default async function handler(req, res) {
