@@ -1,36 +1,39 @@
+// api/callback.js -- vercel serverless function, default handler
+
+// api/callback.js — Vercel serverless function
+// Same logic as the old Express route, just exported as a default handler instead of app.get(...)
+import { exchangeToken } from './_utils.js';
+
 export default async function handler(req, res) {
-  const { code, error } = req.query;
-  const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
-  const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-  const REDIRECT_URI = `https://${req.headers.host}/api/callback`;
+    try {
+        const code = req.query.code || null;
+        const state = req.query.state || null;
+        const error = req.query.error || null;
 
-  if (error) {
-    return res.redirect(`/?error=${error}`);
-  }
+        if (error) {
+            return res.redirect(`/?error=${encodeURIComponent(error)}`);
+        }
 
-  try {
-    const r = await fetch("https://accounts.spotify.com/api/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": "Basic " + Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64"),
-      },
-      body: new URLSearchParams({
-        grant_type: "authorization_code",
-        code,
-        redirect_uri: REDIRECT_URI,
-      }),
-    });
+        if (!code) {
+            return res.redirect('/?error=missing_code');
+        }
 
-    const data = await r.json();
+        const tokens = await exchangeToken({
+            grant_type: 'authorization_code',
+            code,
+            redirect_uri: process.env.REDIRECT_URI,
+        });
 
-    if (!data.refresh_token) {
-      return res.redirect(`/?error=no_refresh_token`);
+        const params = new URLSearchParams({
+            access_token: tokens.access_token,
+            refresh_token: tokens.refresh_token,
+            expires_in: tokens.expires_in,
+            state: state || '',
+        });
+
+        res.redirect(`/?${params.toString()}`);
+    } catch (e) {
+        console.log('Token exchange error:', e.message);
+        res.redirect('/?error=token_exchange_failed');
     }
-
-    // Pass tokens back to the app via URL fragment (never hits server logs)
-    res.redirect(`/?access_token=${data.access_token}&refresh_token=${data.refresh_token}&expires_in=${data.expires_in}`);
-  } catch (e) {
-    res.redirect(`/?error=${e.message}`);
-  }
 }

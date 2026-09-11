@@ -1,5 +1,4 @@
 {
-  "rewrites": [
-    { "source": "/refresh_token", "destination": "/api/refresh_token" }
-  ]
+  "buildCommand": "cd client && npm install && npm run build",
+  "outputDirectory": "client/dist"
 }
