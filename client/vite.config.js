@@ -11,6 +11,6 @@ export default defineConfig({
         host: '127.0.0.1'
     },
     build: {
-        outDir: '../server/public'
+        outDir: 'dist'
     }
 })
