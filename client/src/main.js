@@ -90,7 +90,12 @@ function renderLoop() {
         document.getElementById("lyrics-next1").textContent = nextLine;
         document.getElementById("lyrics-next2").textContent = nextLine2;
         
+    }  else if (currentLyrics && !currentLyrics.synced && !currentLyrics.instrumental) {
+        document.getElementById("lyrics-container").hidden = true;
+        document.getElementById("lyrics-plain").hidden = false;
+        document.getElementById("lyrics-plain").textContent = currentLyrics.lines.join('\n');
     }
+    
     const progressPercent = Math.min(100, (elapsedMs / currentTrackDuration) * 100);
     document.getElementById("progress-fill").style.width = progressPercent + '%';
 

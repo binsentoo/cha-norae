@@ -149,6 +149,16 @@ html, body {
   max-width: 100%;
 }
 
+#lyrics-plain {
+    color: var(--color-text);
+    font-size: 22px;
+    font-family: 'Outfit', 'Noto Sans KR', 'Noto Sans JP', sans-serif;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    text-align: left;
+}
+
 .lyric-line {
   color: var(--color-text-dim);
   font-size: 30px;
