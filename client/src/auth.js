@@ -6,7 +6,6 @@ import {
     setDisplayName, addKnownUserId,
     getActiveUserId,
 } from './storage.js';
-
 import { fetchCurrentUser } from './spotify.js'; 
 
 const SCOPES = [
@@ -15,7 +14,7 @@ const SCOPES = [
     'user-modify-playback-state',
 ].join(' ');
 
-let accessToken = null;  // module-level, never persisted
+let accessToken = null; 
 
 export function startOAuth() {
     const state = crypto.randomUUID();
@@ -29,7 +28,6 @@ export function startOAuth() {
         state: state,
     });
 
-    console.log('redirect_uri:', window.location.origin + '/api/callback');
     window.location.href = 'https://accounts.spotify.com/authorize?' + params;
     
 }

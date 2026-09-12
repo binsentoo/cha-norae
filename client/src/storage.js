@@ -1,4 +1,4 @@
-// storage.js -- handles localStorage reads/writes, mainly for UserID and RefreshToken
+// storage.js -- handles localStorage reads/writes
 
 const KEYS = {
     ACTIVE_USER: 'sp_active_user',

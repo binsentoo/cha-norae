@@ -1,3 +1,4 @@
+/* === VARIABLES === */
 :root {
   --color-bg: #0A0A0F;
   --color-text: #F5F5F0;
@@ -8,6 +9,7 @@
   --font-main: 'Outfit', 'Public Sans', 'Noto Sans KR', 'Noto Sans JP', sans-serif;
 }
 
+/* === RESET == */
 *, *::before, *::after {
     box-sizing: border-box;
 }
@@ -20,6 +22,7 @@ html, body {
   background-color: var(--color-bg);
 }
 
+/* === CONNECT (LOGIN) SCREEN === */
 #connect-screen[hidden] {
   display: none;
 }
@@ -61,6 +64,8 @@ html, body {
   align-items: center;
   gap: 8px;
 }
+
+/* === LYRIC/MAIN SCREEN === */
 
 #player-screen[hidden] {
   display: none;

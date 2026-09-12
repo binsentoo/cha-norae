@@ -22,7 +22,7 @@ export async function fetchCurrentlyPlaying(accessToken) {
     }
 
     if (!response.ok) {
-         const err = new Error('Failed to fetch current song');
+        const err = new Error('Failed to fetch current song');
         err.status = response.status;
         throw err;
     }

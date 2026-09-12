@@ -5,21 +5,50 @@ import { fetchLyrics, getActiveLineIndex } from './lyrics.js';
 import { skipSong } from './spotify.js';
 import { getActiveUserId, getDisplayName } from './storage.js';
 
+// CONFIG & STATE
 const params = new URLSearchParams(window.location.search);
 const isCallback = params.has('access_token') || params.has('error');
 
 let currentLyrics = null;
 let currentTrackDuration = null;
 
+// Determines whether to send user to login or music screen
+async function init() {
+    if (isCallback) { // User just logged in
+        const result = await handleOAuthCallback();
+        if (result.success) enterApp();
+    } else if (getActiveUserId()) { // Returning user with session
+        const refreshed = await refreshAccessToken();
+        if (refreshed) enterApp(); else setupLoginScreen();
+    } else { // New/unknown user
+        setupLoginScreen();
+    }
+
+    // Core persistent UI routines
+    setupGlobalEventListeners();
+    updateClock();
+    setInterval(updateClock, 10000); 
+    requestAnimationFrame(renderLoop);
+}
+
 function enterApp() {
     startPolling(handleTrackUpdate);
+
     document.getElementById("connect-screen").hidden = true;
     document.getElementById("player-screen").hidden = false;
     document.getElementById("display-name").textContent = getDisplayName(getActiveUserId());
+}
+
+function setupLoginScreen() {
+    document.getElementById("connect-btn").addEventListener('click', startOAuth);
+}
+
+// EVENT LISTENERS
+function setupGlobalEventListeners() {
+    // song skip button
     document.getElementById("skip-btn").addEventListener('click', async () => {
-        const accessToken = getAccessToken();
         try {
-            await skipSong(accessToken);
+            await skipSong(getAccessToken());
         } catch (e) {
             if (e.status === 401) {
                 const refreshed = await refreshAccessToken();
@@ -29,27 +58,12 @@ function enterApp() {
             }
         }
     });
+
+    // font size button
+    document.getElementById("change-size").addEventListener('click', changeSize);
 }
 
-async function init() {
-    if (isCallback) {
-        const result = await handleOAuthCallback();
-
-        if (result.success) {
-            enterApp();
-        }
-    } else if (getActiveUserId()) {
-        const refreshed = await refreshAccessToken();
-        if (refreshed) {
-            enterApp();
-        } else {
-            document.getElementById("connect-btn").addEventListener('click', startOAuth);
-        }
-    } else {
-        document.getElementById("connect-btn").addEventListener('click', startOAuth);
-    }
-}
-
+// DATA UPDATES & RENDERING LOOPS
 async function handleTrackUpdate(track) {
     if (track === null) {
         document.getElementById("current-track").textContent = "no song is playing rn";
@@ -72,22 +86,19 @@ async function handleTrackUpdate(track) {
     }
 }
 
-
 // for lyrics + progress bar
 function renderLoop() {
     const elapsedMs = getEstimatedProgressMs();
-    let elapsedSec = elapsedMs / 1000;
+    const elapsedSec = elapsedMs / 1000;
+
+    // render lyric text
     if (currentLyrics && currentLyrics.synced) {
         let index = getActiveLineIndex(currentLyrics.lines, elapsedSec);
-        const prevLine = currentLyrics.lines[index - 1]?.text || '';
-        const currLine = currentLyrics.lines[index].text;
-        const nextLine = currentLyrics.lines[index + 1]?.text || '';
-        const nextLine2 = currentLyrics.lines[index + 2]?.text || '';
-
-        document.getElementById("lyrics-prev").textContent = prevLine;
-        document.getElementById("lyrics-current").textContent = currLine;
-        document.getElementById("lyrics-next1").textContent = nextLine;
-        document.getElementById("lyrics-next2").textContent = nextLine2;
+        
+        document.getElementById("lyrics-prev").textContent = currentLyrics.lines[index - 1]?.text || '';
+        document.getElementById("lyrics-current").textContent = currentLyrics.lines[index].text;
+        document.getElementById("lyrics-next1").textContent = currentLyrics.lines[index + 1]?.text || '';
+        document.getElementById("lyrics-next2").textContent = currentLyrics.lines[index + 2]?.text || '';
         
     }  else if (currentLyrics && !currentLyrics.synced && !currentLyrics.instrumental) {
         document.getElementById("lyrics-container").hidden = true;
@@ -95,6 +106,7 @@ function renderLoop() {
         document.getElementById("lyrics-plain").textContent = currentLyrics.lines.join('\n');
     }
     
+    // render progress bar
     const progressPercent = Math.min(100, (elapsedMs / currentTrackDuration) * 100);
     document.getElementById("progress-fill").style.width = progressPercent + '%';
 
@@ -103,16 +115,12 @@ function renderLoop() {
     requestAnimationFrame(renderLoop);
 }
 
-requestAnimationFrame(renderLoop);
-
+// UTILITY FUNCTIONS
 function updateClock() {
     const now = new Date();
     document.getElementById('time').textContent = 
         now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
 }
-
-updateClock();
-setInterval(updateClock, 10000); // checks every 10 seconds
 
 // handle lyrics sizing
 let fontSize = 30;
@@ -129,7 +137,6 @@ function changeSize() {
     document.getElementById("lyrics-current").style.fontSize = (fontSize + ACTIVE_SIZE_BOOST) + 'px';
 }
 
-document.getElementById("change-size").addEventListener('click', changeSize);
 
 function formatTime(ms) {
     const totalSeconds = Math.floor(ms / 1000);
