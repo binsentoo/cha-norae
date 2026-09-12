@@ -6,7 +6,7 @@ import { skipSong } from './spotify.js';
 import { getActiveUserId, getDisplayName } from './storage.js';
 
 // CONFIG & STATE
-const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(window.location.hash.slice(1));
 const isCallback = params.has('access_token') || params.has('error');
 
 let currentLyrics = null;

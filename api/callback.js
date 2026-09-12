@@ -28,9 +28,9 @@ export default async function handler(req, res) {
             state: state || '',
         });
 
-        res.redirect(`/?${params.toString()}`);
+        res.redirect(`/#${params.toString()}`);
     } catch (e) {
-        console.log('Token exchange error:', e.message);
+        console.error('Spotify token exchange failed details:', e.response?.data || e.message || e);
         res.redirect('/?error=token_exchange_failed');
     }
 }

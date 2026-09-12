@@ -33,7 +33,7 @@ export function startOAuth() {
 }
 
 export async function handleOAuthCallback() {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.hash.slice(1));
     const token = params.get('access_token');
     const refreshToken = params.get('refresh_token');
     const returnedState = params.get('state');
