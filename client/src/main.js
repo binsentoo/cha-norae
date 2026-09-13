@@ -94,6 +94,9 @@ function renderLoop() {
     // render lyric text
     if (currentLyrics && currentLyrics.synced) {
         let index = getActiveLineIndex(currentLyrics.lines, elapsedSec);
+
+        document.getElementById("lyrics-container").hidden = false;
+        document.getElementById("lyrics-plain").hidden = true;
         
         document.getElementById("lyrics-prev").textContent = currentLyrics.lines[index - 1]?.text || '';
         document.getElementById("lyrics-current").textContent = currentLyrics.lines[index].text;
@@ -104,6 +107,16 @@ function renderLoop() {
         document.getElementById("lyrics-container").hidden = true;
         document.getElementById("lyrics-plain").hidden = false;
         document.getElementById("lyrics-plain").textContent = currentLyrics.lines.join('\n');
+
+    } else if (currentLyrics && currentLyrics.instrumental) {
+        document.getElementById("lyrics-container").hidden = true;
+        document.getElementById("lyrics-plain").hidden = false;
+        document.getElementById("lyrics-plain").textContent = "instrumental";
+
+    } else if (currentLyrics === null) {
+        document.getElementById("lyrics-container").hidden = true;
+        document.getElementById("lyrics-plain").hidden = false;
+        document.getElementById("lyrics-plain").textContent = "No lyrics found";
     }
     
     // render progress bar

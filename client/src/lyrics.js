@@ -31,7 +31,12 @@ export async function fetchLyrics(title, artist, album, durationSec) {
     const response2 = await fetch(url2);
 
     if (response2.ok) {
-        const results = await response2.json(); 
+        const results = await response2.json();
+
+        if (results.length === 0) {
+            return null; // no lyrics found at all
+        }
+
         const data = results[0]; // TODO: temp fix
 
         if (data.instrumental) {
