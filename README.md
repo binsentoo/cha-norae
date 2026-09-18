@@ -16,12 +16,13 @@ Using Spotify's Web App API, it polls the currently playing song and searches fo
 - **Real-time lyric highlighting** for synced lyrics using `requestAnimationFrame`, decoupled from live track polling that also allows for lyric drift prevention.
 - **Skip song, adjustable font size** buttons, that are enlarged for easy usage.
 
-# How to Host
+## How to Host
 The tech stack/architecture is built using serverless functions that allows for hosting on sites like Vercel.
 
 1. Create a Spotify app in the Spotify Developer Dashboard.
 2. Set your redirect URI in the dashboard settings to match your deployed domain. THIS MUST MATCH.
 3. Deploy to Vercel, setting the following environmental variables:
+4. 
 | Variable | Value |
 |---|---|
 | `SPOTIFY_CLIENT_ID` | From your Spotify app |
@@ -29,7 +30,6 @@ The tech stack/architecture is built using serverless functions that allows for 
 | `VITE_SPOTIFY_CLIENT_ID` | Same as `SPOTIFY_CLIENT_ID` |
 | `REDIRECT_URI` | Your exact redirect URI from step 2 |
 
-Should you want to host locally:
 ## Local Development
 ```bash
 npm install -g vercel
