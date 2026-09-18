@@ -22,7 +22,7 @@ The tech stack/architecture is built using serverless functions that allows for 
 1. Create a Spotify app in the Spotify Developer Dashboard.
 2. Set your redirect URI in the dashboard settings to match your deployed domain. THIS MUST MATCH.
 3. Deploy to Vercel, setting the following environmental variables:
-4. 
+   
 | Variable | Value |
 |---|---|
 | `SPOTIFY_CLIENT_ID` | From your Spotify app |
