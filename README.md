@@ -15,6 +15,9 @@ Using Spotify's Web App API, it polls the currently playing song and searches fo
 - **Synced and unsynced lyric support** via LRCLIB, includes instrumental and 404-no-lyrics-available states.
 - **Real-time lyric highlighting** for synced lyrics using `requestAnimationFrame`, decoupled from live track polling that also allows for lyric drift prevention.
 - **Skip song, adjustable font size** buttons, that are enlarged for easy usage.
+- **Spotify OAuth (Authorization Code Flow)** with CSRF protection via a `state` parameter
+- **Keyed multi-user storage** - refresh tokens are stored per Spotify user ID in `localStorage`, with silent reconnect on page reload so a returning user never has to re-authenticate
+- **Reactive token refresh** - access tokens refresh on-demand when a request returns 401, rather than on a fixed timer
 
 ## How to Host
 The tech stack/architecture is built using serverless functions that allows for hosting on sites like Vercel.
