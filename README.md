@@ -7,7 +7,7 @@ https://cha-norae.vercel.app/
 
 ## About
 Using Spotify's Web App API, it polls the currently playing song and searches for the associated lyrics via LRCLIB. If available, the app uses the lyric timestamps to support synced lyric scrolling.
-
+While the Spotify app also supports lyrics, the database is not as large and the display is not easily readable. The Spotify App does allow for Fullscreen lyric display, but it disappears after every song--making it difficult to use while driving.
 ![Example Image](example.png)
 
 ## Features
